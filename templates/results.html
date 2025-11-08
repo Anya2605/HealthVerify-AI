@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Results - HealthVerify AI{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Validation Results</h1>
+    <p class="text-gray-600">Job ID: {{ job_id }}</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-gray-600 text-sm mb-1">Total Providers</div>
+        <div class="text-3xl font-bold text-blue-600">{{ summary.total_providers }}</div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-gray-600 text-sm mb-1">Validated</div>
+        <div class="text-3xl font-bold text-green-600">{{ summary.validated }}</div>
+        <div class="text-sm text-gray-500">{{ summary.validation_rate }}%</div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-gray-600 text-sm mb-1">Avg Confidence</div>
+        <div class="text-3xl font-bold text-purple-600">{{ summary.average_confidence }}%</div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-gray-600 text-sm mb-1">Total Flags</div>
+        <div class="text-3xl font-bold text-orange-600">{{ summary.total_flags }}</div>
+    </div>
+</div>
+
+<!-- Results Table -->
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Validation Results</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left py-2">Provider ID</th>
+                    <th class="text-left py-2">Status</th>
+                    <th class="text-left py-2">Confidence</th>
+                    <th class="text-left py-2">NPI</th>
+                    <th class="text-left py-2">Address</th>
+                    <th class="text-left py-2">Phone</th>
+                    <th class="text-left py-2">Flags</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-2">{{ result.provider_id }}</td>
+                    <td class="py-2">
+                        <span class="px-2 py-1 rounded text-xs {% if result.validation_status == 'VALIDATED' %}bg-green-100 text-green-800{% elif result.validation_status == 'PARTIAL' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ result.validation_status }}
+                        </span>
+                    </td>
+                    <td class="py-2">{{ result.overall_confidence }}%</td>
+                    <td class="py-2">
+                        <span class="{% if result.validations.npi.valid %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ '✓' if result.validations.npi.valid else '✗' }}
+                        </span>
+                    </td>
+                    <td class="py-2">
+                        <span class="{% if result.validations.address.valid %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ '✓' if result.validations.address.valid else '✗' }}
+                        </span>
+                    </td>
+                    <td class="py-2">
+                        <span class="{% if result.validations.phone.valid %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ '✓' if result.validations.phone.valid else '✗' }}
+                        </span>
+                    </td>
+                    <td class="py-2">
+                        <span class="{% if result.flags|length > 0 %}text-orange-600 font-semibold{% else %}text-gray-400{% endif %}">
+                            {{ result.flags|length }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="text-center">
+    <a href="{{ url_for('export', job_id=job_id) }}" 
+       class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 inline-block">
+        Export Report
+    </a>
+</div>
+{% endblock %}
+

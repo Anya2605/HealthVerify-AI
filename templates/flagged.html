@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Flagged Items - HealthVerify AI{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Flagged Items for Review</h1>
+    <p class="text-gray-600">Items requiring manual review</p>
+</div>
+
+{% if flags_by_provider %}
+    {% for provider_id, provider_data in flags_by_provider.items() %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h2 class="text-xl font-semibold">{{ provider_data.provider.full_name or provider_id }}</h2>
+                <p class="text-gray-600">Provider ID: {{ provider_id }}</p>
+                <p class="text-gray-600">NPI: {{ provider_data.provider.npi }}</p>
+            </div>
+            <div class="text-right">
+                <span class="px-3 py-1 rounded text-sm bg-red-100 text-red-800">
+                    {{ provider_data.flags|length }} Flag(s)
+                </span>
+            </div>
+        </div>
+        
+        <div class="space-y-3">
+            {% for flag in provider_data.flags %}
+            <div class="border-l-4 {% if flag.flag_type == 'CRITICAL' %}border-red-500 bg-red-50{% elif flag.flag_type == 'WARNING' %}border-yellow-500 bg-yellow-50{% else %}border-blue-500 bg-blue-50{% endif %} p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="font-semibold {% if flag.flag_type == 'CRITICAL' %}text-red-800{% elif flag.flag_type == 'WARNING' %}text-yellow-800{% else %}text-blue-800{% endif %}">
+                            {{ flag.flag_type }}
+                        </span>
+                        <span class="text-gray-600 ml-2">{{ flag.field }}</span>
+                        <p class="mt-1">{{ flag.message }}</p>
+                        {% if flag.details %}
+                        <p class="text-sm text-gray-600 mt-2">{{ flag.details|tojson }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+        <p class="text-gray-600 text-xl">No flagged items found. All providers validated successfully!</p>
+    </div>
+{% endif %}
+{% endblock %}
+

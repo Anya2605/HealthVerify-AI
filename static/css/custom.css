@@ -1,0 +1,38 @@
+/* Custom CSS for HealthVerify AI */
+
+/* Animations */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Custom styles */
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+/* Table styles */
+table {
+    border-collapse: collapse;
+}
+
+table th {
+    font-weight: 600;
+    color: #374151;
+}
+
+table td, table th {
+    padding: 0.75rem;
+}
+
+/* Card hover effects */
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
